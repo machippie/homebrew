@@ -81,11 +81,6 @@
 - become: "{{ (homebrew_user != ansible_user_id) | bool }}"
   become_user: "{{ homebrew_user }}"
   block:
-
-
-
-
-
     - name: Force global update
       when: not homebrew_binary.stat.exists
       command: /usr/local/bin/brew update --force
@@ -93,6 +88,7 @@
         - homebrew
 
     - name: Detect cache directory
+      when: homebrew_binary.stat.exists
       register: homebrew_cache
       command: /usr/local/bin/brew --cache
       changed_when: False
