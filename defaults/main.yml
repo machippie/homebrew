@@ -1,0 +1,59 @@
+# Standards: 0.1
+---
+# @var homebrew_user:description: User to run user-specific commands
+# @var homebrew_user:value: homebrew_user | default(ansible_user_id)
+# homebrew_user:
+
+# @var homebrew_group:description: Group to run user-specific commands
+# @var homebrew_group:value: homebrew_group | default(ansible_user_gid)
+# homebrew_group:
+
+# @var homebrew_clear_cache:description: Clear cache after installation
+homebrew_clear_cache: True
+
+# @var homebrew_cask_dir:description: Destination directory for casks
+homebrew_cask_dir: /Applications
+
+# @var homebrew_cask_accept_external_apps:description: Accept external cask apps
+homebrew_cask_accept_external_apps: False
+
+# @var homebrew_taps:description: List of taps to install or uninstall
+# @var homebrew_taps:example: >
+# homebrew_taps:
+#   - foo/bar
+#   - name: bar
+#     url: https://github.com/foo/bar
+#     state: present
+#   - name: foo/baz
+#     state: absent
+# @end
+homebrew_taps: []
+
+# @var homebrew_casks:description: List of casks to install or uninstall
+# @var homebrew_casks:example: >
+# homebrew_casks:
+#   - foo
+#   - name: bar
+#     greedy: True
+#     options: debug,appdir=/Applications
+#     accept_external_apps: True
+#     state: present
+#   - name: baz
+#     state: absent
+# @end
+homebrew_casks: []
+
+# @var homebrew_packages:description: List of packages to install or uninstall
+# @var homebrew_packages:example: >
+# homebrew_packages:
+#   - foo
+#   - name: bar
+#     greedy: True
+#     options: with-baz,enable-debug
+#     state: present
+#   - name: baz
+#     state: absent
+# @end
+homebrew_packages: []
+
+...

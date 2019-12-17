@@ -1,0 +1,138 @@
+# Standards: 0.1
+---
+- name: Fact homebrew user
+  set_fact:
+    homebrew_user: "{{ homebrew_user | default(ansible_user_id) }}"
+    homebrew_group: "{{ homebrew_group | default(ansible_user_gid) }}"
+  tags:
+    - homebrew
+
+- name: Create homebrew directory
+  file:
+    path: /usr/local/Homebrew
+    state: directory
+    owner: "{{ homebrew_user }}"
+    group: "{{ homebrew_group }}"
+    mode: u=rwx,g=rwx,o=rx
+  tags:
+    - homebrew
+
+- name: Create bin directory
+  file:
+    path: /usr/local/bin
+    state: directory
+    owner: "{{ homebrew_user }}"
+    group: "{{ homebrew_group }}"
+    mode: u=rwx,g=rwx,o=rx
+  tags:
+    - homebrew
+
+- name: Install git repo
+  git:
+    repo: https://github.com/Homebrew/brew
+    version: master
+    dest: /usr/local/Homebrew
+    update: False
+    depth: 1
+  tags:
+    - homebrew
+
+- name: Check brew binary
+  register: homebrew_binary
+  stat:
+    path: /usr/local/bin/brew
+  check_mode: False
+  tags:
+    - homebrew
+
+- name: Symlink brew binary
+  file:
+    src: /usr/local/Homebrew/bin/brew
+    dest: /usr/local/bin/brew
+    force: True
+    state: link
+  tags:
+    - homebrew
+
+- name: Fix directories owner
+  loop:
+    - Caskroom
+    - Cellar
+    - Frameworks
+    - Homebrew
+    - bin
+    - etc
+    - include
+    - lib
+    - opt
+    - sbin
+    - share
+    - var
+    - var/homebrew/linked
+  file:
+    path: "/usr/local/{{ item }}"
+    state: directory
+    owner: "{{ homebrew_user }}"
+    group: "{{ homebrew_group }}"
+    recurse: True
+  tags:
+    - homebrew
+
+- become: "{{ (homebrew_user != ansible_user_id) | bool }}"
+  become_user: "{{ homebrew_user }}"
+  block:
+
+
+
+
+
+    - name: Force global update
+      when: not homebrew_binary.stat.exists
+      command: /usr/local/bin/brew update --force
+      tags:
+        - homebrew
+
+    - name: Detect cache directory
+      register: homebrew_cache
+      command: /usr/local/bin/brew --cache
+      changed_when: False
+      check_mode: False
+      tags:
+        - homebrew
+
+    - name: Install/Remove taps
+      loop: "{{ homebrew_install_taps }}"
+      homebrew_tap:
+        tap: "{{ item.name | default(item) }}"
+        url: "{{ item.url | default(omit) }}"
+        state: "{{ item.state | default('present') }}"
+      tags:
+        - homebrew
+
+    - name: Install/Remove casks
+      loop: "{{ homebrew_install_casks }}"
+      notify:
+        - clear cache
+      ignore_errors: True
+      homebrew_cask:
+        name: "{{ item.name | default(item) }}"
+        greedy: "{{ item.greedy | default(True) }}"
+        options: "{{ item.options | default('appdir=' + homebrew_cask_dir) }}"
+        accept_external_apps: "{{ item.accept_external_apps | default(homebrew_cask_accept_external_apps) }}"
+        state: "{{ item.state | default('upgraded') }}"
+      tags:
+        - homebrew
+
+    - name: Install/Remove packages
+      loop: "{{ homebrew_install_packages }}"
+      ignore_errors: True
+      notify:
+        - clear cache
+      homebrew:
+        name: "{{ item.name | default(item) }}"
+        options: "{{ item.options | default(omit) }}"
+        state: "{{ item.state | default('latest') }}"
+      tags:
+        - homebrew
+
+...
