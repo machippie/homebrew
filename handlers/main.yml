@@ -1,6 +1,6 @@
 # Standards: 0.1
 ---
-- name: Clear cache directory
+- name: Clear cache
   when: "homebrew_clear_cache | bool"
   file:
     path: "{{ homebrew_cache.stdout | trim }}"

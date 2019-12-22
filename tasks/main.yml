@@ -108,7 +108,7 @@
     - name: Install/Remove casks
       loop: "{{ homebrew_install_casks }}"
       notify:
-        - clear cache
+        - Clear cache
       ignore_errors: True
       homebrew_cask:
         name: "{{ item.name | default(item) }}"
@@ -123,7 +123,7 @@
       loop: "{{ homebrew_install_packages }}"
       ignore_errors: True
       notify:
-        - clear cache
+        - Clear cache
       homebrew:
         name: "{{ item.name | default(item) }}"
         options: "{{ item.options | default(omit) }}"
