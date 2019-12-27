@@ -97,7 +97,7 @@
         - homebrew
 
     - name: Install/Remove taps
-      loop: "{{ homebrew_install_taps }}"
+      loop: "{{ homebrew_taps }}"
       homebrew_tap:
         tap: "{{ item.name | default(item) }}"
         url: "{{ item.url | default(omit) }}"
@@ -106,7 +106,7 @@
         - homebrew
 
     - name: Install/Remove casks
-      loop: "{{ homebrew_install_casks }}"
+      loop: "{{ homebrew_casks }}"
       notify:
         - Clear cache
       ignore_errors: True
@@ -119,8 +119,8 @@
       tags:
         - homebrew
 
-    - name: Install/Remove packages
-      loop: "{{ homebrew_install_packages }}"
+    - name: Install/Remove pkgs
+      loop: "{{ homebrew_packages }}"
       ignore_errors: True
       notify:
         - Clear cache
