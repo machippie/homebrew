@@ -81,7 +81,6 @@ homebrew_packages: []
 homebrew_packages:
   - foo
   - name: bar
-    greedy: True
     options: with-baz,enable-debug
     state: present
   - name: baz
